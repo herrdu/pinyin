@@ -1,0 +1,26 @@
+{
+  "defaultSeverity": "warning",
+  "extends": ["tslint:recommended"],
+  "linterOptions": {
+    "exclude": ["node_modules/**"]
+  },
+  "rules": {
+    "no-namespace": false,
+    "variable-name": false,
+    "indent": [true, "spaces", 2],
+    "interface-name": false,
+    "no-consecutive-blank-lines": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": false,
+    "no-trailing-whitespace": true,
+    "member-access": [true, "no-public"],
+    "member-ordering": false,
+    "max-file-line-count": [true, 1000],
+    "max-classes-per-file": [true, 10],
+    "arrow-parens": [true, "ban-single-arg-parens"],
+    "no-console": false,
+    "no-var-requires": false,
+    "no-bitwise": false,
+    "quotemark": [true, "single", "jsx-double"]
+  }
+}

@@ -1,34 +1,38 @@
-import DICT from "./dict";
+import DICT from './dict';
 
-const FIRST_PINYIN_UNIHAN = "\u963F";
-const LAST_PINYIN_UNIHAN = "\u9FFF";
+const FIRST_PINYIN_UNIHAN = '\u963F';
+const LAST_PINYIN_UNIHAN = '\u9FFF';
 
 const LATIN = 1;
 const PINYIN = 2;
 const UNKNOWN = 3;
 
-let supported = null;
+let supported: boolean = false;
 let COLLATOR: Intl.Collator;
 
 function patchDict(patchers: any) {
-  if (!patchers) return;
-  if (typeof patchers === "function") {
+  if (!patchers) {
+    return;
+  }
+  if (typeof patchers === 'function') {
     patchers = [patchers];
   }
   if (patchers.forEach) {
     patchers.forEach((p: any) => {
-      typeof p === "function" && p(DICT);
+      if (typeof p === 'function') {
+        p(DICT);
+      }
     });
   }
 }
 
 function isSupported(force?: boolean) {
-  if (!force && supported !== null) {
+  if (!force && supported) {
     return supported;
   }
-  if (typeof Intl === "object" && Intl.Collator) {
-    COLLATOR = new Intl.Collator(["zh-Hans-CN", "zh-CN"]);
-    supported = Intl.Collator.supportedLocalesOf(["zh-CN"]).length === 1;
+  if (typeof Intl === 'object' && Intl.Collator) {
+    COLLATOR = new Intl.Collator(['zh-Hans-CN', 'zh-CN']);
+    supported = Intl.Collator.supportedLocalesOf(['zh-CN']).length === 1;
   } else {
     supported = false;
   }
@@ -45,7 +49,7 @@ function genToken(ch: string) {
     type?: number;
     target?: string;
   } = {
-    source: ch
+    source: ch,
   };
 
   // First check EXCEPTIONS map, then search with UNIHANS table.
@@ -89,19 +93,17 @@ function genToken(ch: string) {
     let end = UNIHANS.length - 1;
     while (begin <= end) {
       offset = ~~((begin + end) / 2);
-      let unihan = UNIHANS[offset];
+      const unihan = UNIHANS[offset];
       cmp = COLLATOR.compare(ch, unihan);
 
       // Catch it.
       if (cmp === 0) {
         break;
-      }
-      // Search after offset.
-      else if (cmp > 0) {
+      } else if (cmp > 0) {
+        // Search after offset.
         begin = offset + 1;
-      }
-      // Search before the offset.
-      else {
+      } else {
+        // Search before the offset.
         end = offset - 1;
       }
     }
@@ -120,13 +122,13 @@ function genToken(ch: string) {
 }
 
 function parse(str: string) {
-  if (typeof str !== "string") {
-    throw new Error("argument should be string.");
+  if (typeof str !== 'string') {
+    throw new Error('argument should be string.');
   }
   if (!isSupported()) {
-    throw new Error("not support Intl or zh-CN language.");
+    throw new Error('not support Intl or zh-CN language.');
   }
-  return str.split("").map(v => genToken(v));
+  return str.split('').map(v => genToken(v));
 }
 
 export default {
@@ -136,12 +138,12 @@ export default {
   genToken, // inner usage
   convertToPinyin(str: string, separator?: string, lowerCase?: boolean) {
     return parse(str)
-      .map(v => {
+      .map((v: any) => {
         if (lowerCase && v.type === PINYIN) {
           return v.target.toLowerCase();
         }
         return v.target;
       })
-      .join(separator || "");
-  }
+      .join(separator || '');
+  },
 };
